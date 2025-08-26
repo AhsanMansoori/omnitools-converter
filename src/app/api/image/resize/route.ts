@@ -119,7 +119,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const resizedFileName = `resized-${originalName}-${processedMetadata.width}x${processedMetadata.height}.${outputFormat}`
 
     // Return binary response with appropriate headers
-    return new NextResponse(outputBuffer, {
+    return new NextResponse(new Uint8Array(outputBuffer), {
       status: 200,
       headers: {
         'Content-Type': 'application/octet-stream',

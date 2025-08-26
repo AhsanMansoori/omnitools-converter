@@ -46,7 +46,7 @@ function getQueue(): Queue | null {
     const redis = getRedisConnection()
     
     fileProcessingQueue = new Queue('file-processing', {
-      connection: redis,
+      connection: redis as any, // Type assertion to handle Redis/MockRedis union type
       defaultJobOptions: {
         removeOnComplete: 100, // Keep last 100 completed jobs
         removeOnFail: 50,      // Keep last 50 failed jobs

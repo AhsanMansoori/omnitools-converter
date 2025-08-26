@@ -58,12 +58,12 @@ export function UploadBox({ tool, onSubmit, disabled = false, className }: Uploa
     return null
   }
 
-  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: Array<{ file: File; errors: Array<{ code: string; message: string }> }>) => {
+  const onDrop = useCallback((acceptedFiles: File[], fileRejections: any[]) => {
     const newErrors: string[] = []
     
     // Handle rejected files
-    rejectedFiles.forEach(({ file, errors: dropErrors }) => {
-      dropErrors.forEach((error: { code: string; message: string }) => {
+    fileRejections.forEach(({ file, errors: dropErrors }) => {
+      dropErrors.forEach((error: any) => {
         if (error.code === "file-too-large") {
           newErrors.push(`File "${file.name}" is too large`)
         } else if (error.code === "file-invalid-type") {

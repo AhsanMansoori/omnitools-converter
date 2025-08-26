@@ -55,7 +55,7 @@ class PdfCompressProcessor extends BaseProcessor {
       success: true,
       outputFiles: [{
         name: inputFile.name.replace('.pdf', '_compressed.pdf'),
-        path: this.generateOutputPath(inputFile.path, '_compressed'),
+        path: this.generateOutputPath((inputFile.path as string) || `/temp/${inputFile.name}`, '_compressed'),
         size: Math.floor(inputFile.size * 0.6), // 40% compression
         mimeType: 'application/pdf',
         url: `/api/download/${inputFile.name.replace('.pdf', '_compressed.pdf')}`
@@ -74,7 +74,7 @@ class PdfWatermarkAddProcessor extends BaseProcessor {
       success: true,
       outputFiles: [{
         name: inputFile.name.replace('.pdf', '_watermarked.pdf'),
-        path: this.generateOutputPath(inputFile.path, '_watermarked'),
+        path: this.generateOutputPath((inputFile.path as string) || `/temp/${inputFile.name}`, '_watermarked'),
         size: Math.floor(inputFile.size * 1.1), // Slight size increase
         mimeType: 'application/pdf',
         url: `/api/download/${inputFile.name.replace('.pdf', '_watermarked.pdf')}`
@@ -93,7 +93,7 @@ class ImageBgRemoveProcessor extends BaseProcessor {
       success: true,
       outputFiles: [{
         name: inputFile.name.replace(/\.[^.]+$/, '_no_bg.png'),
-        path: this.generateOutputPath(inputFile.path, '_no_bg', 'png'),
+        path: this.generateOutputPath((inputFile.path as string) || `/temp/${inputFile.name}`, '_no_bg', 'png'),
         size: Math.floor(inputFile.size * 0.8),
         mimeType: 'image/png',
         url: `/api/download/${inputFile.name.replace(/\.[^.]+$/, '_no_bg.png')}`
@@ -113,7 +113,7 @@ class ImageConvertProcessor extends BaseProcessor {
       success: true,
       outputFiles: [{
         name: inputFile.name.replace(/\.[^.]+$/, `.${targetFormat}`),
-        path: this.generateOutputPath(inputFile.path, '_converted', targetFormat),
+        path: this.generateOutputPath((inputFile.path as string) || `/temp/${inputFile.name}`, '_converted', targetFormat as string),
         size: Math.floor(inputFile.size * 0.9),
         mimeType: `image/${targetFormat}`,
         url: `/api/download/${inputFile.name.replace(/\.[^.]+$/, `.${targetFormat}`)}`
@@ -132,7 +132,7 @@ class WebpToMp4Processor extends BaseProcessor {
       success: true,
       outputFiles: [{
         name: inputFile.name.replace('.webp', '.mp4'),
-        path: this.generateOutputPath(inputFile.path, '_converted', 'mp4'),
+        path: this.generateOutputPath((inputFile.path as string) || `/temp/${inputFile.name}`, '_converted', 'mp4'),
         size: Math.floor(inputFile.size * 1.5), // Video files typically larger
         mimeType: 'video/mp4',
         url: `/api/download/${inputFile.name.replace('.webp', '.mp4')}`
@@ -151,7 +151,7 @@ class OcrPdfProcessor extends BaseProcessor {
       success: true,
       outputFiles: [{
         name: inputFile.name.replace('.pdf', '_ocr.pdf'),
-        path: this.generateOutputPath(inputFile.path, '_ocr'),
+        path: this.generateOutputPath((inputFile.path as string) || `/temp/${inputFile.name}`, '_ocr'),
         size: Math.floor(inputFile.size * 1.2), // OCR may increase size
         mimeType: 'application/pdf',
         url: `/api/download/${inputFile.name.replace('.pdf', '_ocr.pdf')}`
