@@ -71,7 +71,7 @@ requiredDeps.forEach(dep => {
 // 5. Configuration checks
 console.log('\n⚙️  Configuration:');
 checkFileContent('next.config.mjs', 'supabase.co', 'Supabase domain configured');
-checkFileContent('worker/index.ts', 'console.log("Worker ready")', 'Worker ready message');
+checkFileContent('worker/index.ts', "console.log('ready')", 'Worker ready message');
 checkFileContent('package.json', '"build": "next build"', 'Build script configured');
 
 // 6. Git status
