@@ -1,25 +1,36 @@
--- Supabase Storage Setup for OmniTools
--- Run these commands in Supabase SQL Editor
+-- OmniTools Supabase Setup Script
+-- Run these commands in your Supabase SQL Editor
 
--- 1. Create storage bucket (if not exists)
-INSERT INTO storage.buckets (id, name, public) 
-VALUES ('files', 'files', true)
-ON CONFLICT (id) DO NOTHING;
+-- 1. Create storage bucket for files
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'files',
+  'files',
+  true,
+  52428800, -- 50MB limit
+  ARRAY['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/tiff', 
+        'application/pdf', 'application/msword', 
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo']
+);
 
--- 2. Set up storage policies for public access
-CREATE POLICY "Public Access" ON storage.objects
-FOR SELECT USING (bucket_id = 'files');
+-- 2. Set up RLS (Row Level Security) policies for the files bucket
+CREATE POLICY "Give users authenticated access to folder" ON storage.objects FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Give anon users access to folder" ON storage.objects FOR ALL USING (auth.role() = 'anon');
 
--- 3. Allow authenticated uploads (optional - for future auth)
-CREATE POLICY "Allow uploads" ON storage.objects
-FOR INSERT WITH CHECK (bucket_id = 'files');
+-- 3. Enable RLS on storage.objects (if not already enabled)
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
--- 4. Allow file deletion (for cleanup)
-CREATE POLICY "Allow deletion" ON storage.objects
-FOR DELETE USING (bucket_id = 'files');
+-- 4. Create a function to clean up old files (optional)
+CREATE OR REPLACE FUNCTION cleanup_old_files()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM storage.objects 
+  WHERE bucket_id = 'files' 
+    AND created_at < NOW() - INTERVAL '24 hours';
+END;
+$$ LANGUAGE plpgsql;
 
--- 5. View existing policies
-SELECT * FROM pg_policies WHERE tablename = 'objects';
-
--- 6. Test bucket access
-SELECT * FROM storage.buckets WHERE name = 'files';
+-- 5. Create a scheduled job to run cleanup daily (requires pg_cron extension)
+-- Note: This might not be available on all Supabase plans
+-- SELECT cron.schedule('cleanup-old-files', '0 2 * * *', 'SELECT cleanup_old_files();');
